@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математичне моделювання</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-dark: #2c3e50;
+            --accent-color: #ff6b6b;
+            --border-radius: 12px;
+            --content-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --hover-color: #ff5252;
+            --nav-gradient: linear-gradient(135deg, #ff6b6b, #2c3e50);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --input-bg: #ffffff;
+            --chart-grid: rgba(0, 0, 0, 0.1);
+            --chart-text: #212529;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-dark: #e0e0e0;
+            --content-bg: #2d2d2d;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --hover-color: #ff5252;
+            --nav-gradient: linear-gradient(135deg, #2c3e50, #1a1a1a);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: #363636;
+            --chart-grid: rgba(255, 255, 255, 0.1);
+            --chart-text: #e0e0e0;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar {
+            background: var(--nav-gradient);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .content-block {
+            background: var(--content-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .content-block:hover {
+            box-shadow: 0 6px 12px var(--shadow-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-calculate {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-calculate:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+        }
+        
+        .modern-input, .modern-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            border-radius: calc(var(--border-radius) / 2);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .modern-input:focus, .modern-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
+            outline: none;
+        }
+        
+        .nav-pills .nav-link {
+            color: var(--text-dark) !important;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--accent-color);
+            color: white !important;
+        }
+        
+        .nav-pills .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+        
+        .chart-container {
+            background: var(--content-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 2rem;
+            min-height: 300px;
+        }
+        
+        .model-stats {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            color: var(--text-dark);
+        }
+        
+        footer {
+            margin-top: auto;
+            background: var(--nav-gradient);
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        .hero-section {
+            background: var(--nav-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .nav-pills-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .nav-pills {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+        }
+        
+        .nav-pills .nav-item {
+            flex: 0 1 250px;
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-graph-up"></i> Математичне моделювання
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house"></i> Головна
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                                <i class="bi bi-person"></i> Профіль
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Вийти
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Увійти
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:register' %}">
+                                <i class="bi bi-person-plus"></i> Реєстрація
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="flex-grow-1">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="text-center py-3">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Математичне моделювання. Всі права захищені.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Theme initialization -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем сохраненную тему
+        const savedTheme = localStorage.getItem('theme') || '{{ user.theme_preference }}';
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            // Обновляем цвета графиков если они есть
+            const charts = [window.analysisChart, window.modelingChart, window.optimizationChart];
+            charts.forEach(chart => {
+                if (chart) {
+                    updateChartColors(chart, savedTheme === 'dark');
+                }
+            });
+        }
+    });
+
+    function updateChartColors(chart, isDark) {
+        if (!chart) return;
+        
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const textColor = isDark ? '#e0e0e0' : '#212529';
+        
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.x.ticks.color = textColor;
+        chart.options.scales.y.ticks.color = textColor;
+        chart.options.plugins.legend.labels.color = textColor;
+        
+        chart.update();
+    }
+    </script>
+</body>
+</html> 

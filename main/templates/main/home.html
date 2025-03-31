@@ -1,0 +1,468 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математичний аналіз</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <style>
+    /* Общие стили */
+    :root {
+        --primary-color: #2c3e50;
+        --accent-color: #ff6b6b;
+        --text-light: #ffffff;
+        --text-dark: #2c3e50;
+        --block-width: 100%;
+        --block-padding: 2rem;
+        --border-radius: 12px;
+        --nav-gradient: linear-gradient(135deg, #2c3e50 0%, #ff6b6b 100%);
+        --content-bg: #ffffff;
+        --card-bg: #f8f9fa;
+        --border-color: #e9ecef;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        --hover-color: #ff5252;
+        --input-bg: #ffffff;
+    }
+
+    /* Темная тема */
+    [data-theme="dark"] {
+        --primary-color: #1a1a1a;
+        --accent-color: #ff6b6b;
+        --text-light: #ffffff;
+        --text-dark: #ffffff;
+        --nav-gradient: linear-gradient(135deg, #1a1a1a 0%, #ff6b6b 100%);
+        --content-bg: #2c2c2c;
+        --card-bg: #363636;
+        --border-color: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --input-bg: #363636;
+    }
+
+    [data-theme="dark"] .hero-section h1,
+    [data-theme="dark"] .hero-section p,
+    [data-theme="dark"] .form-label,
+    [data-theme="dark"] .modern-input,
+    [data-theme="dark"] .modern-select,
+    [data-theme="dark"] .stat-label,
+    [data-theme="dark"] .stat-value {
+        color: var(--text-light);
+    }
+
+    [data-theme="dark"] .modern-input,
+    [data-theme="dark"] .modern-select {
+        background-color: var(--input-bg);
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .content-block {
+        background: var(--content-bg);
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .model-stats {
+        background: var(--card-bg);
+    }
+
+    [data-theme="dark"] .stat-item {
+        background: var(--content-bg);
+    }
+
+    /* Общий контейнер */
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    /* Hero секция */
+    .hero-section {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        background: var(--nav-gradient);
+        padding: 2rem;
+        color: var(--text-light);
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-left: 15%;
+        padding-right: 15%;
+    }
+
+    .hero-section h1 {
+        color: var(--text-light);
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 100%;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Навигационные табы в hero секции */
+    .nav-pills-container {
+        margin: 2rem auto;
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    .nav-pills {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        gap: 1rem;
+        flex-wrap: nowrap !important;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-pills .nav-item {
+        flex: 1;
+        min-width: 200px;
+        max-width: 250px;
+    }
+
+    .nav-pills .nav-link {
+        width: 100%;
+        padding: 1rem;
+        color: var(--text-light) !important;
+        background: var(--accent-color) !important;
+        border: none;
+        border-radius: var(--border-radius) !important;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link:hover,
+    .nav-pills .nav-link.active {
+        background: var(--hover-color) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    /* Секции ввода */
+    .input-section {
+        width: 100%;
+        max-width: var(--block-width);
+        margin: 0;
+        padding: var(--block-padding);
+        box-sizing: border-box;
+    }
+
+    .input-section h3 {
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Поля ввода */
+    .modern-input, .modern-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: calc(var(--border-radius) / 2);
+        font-size: 1rem;
+        color: var(--text-dark);
+        background-color: var(--input-bg);
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus, .modern-select:focus {
+        border-color: var(--accent-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+
+    /* Кнопки */
+    .btn-calculate {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: var(--accent-color);
+        color: var(--text-light);
+        border: none;
+        border-radius: calc(var(--border-radius) / 2);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-calculate:hover {
+        background: var(--hover-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    /* График */
+    .chart-container {
+        width: 100%;
+        height: 400px;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Общий контейнер для input и chart */
+    .content-block {
+        width: 100%;
+        max-width: var(--block-width);
+        margin: 0 auto 2rem auto;
+        background: var(--content-bg);
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 15px var(--shadow-color);
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Метки */
+    .form-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    /* Статистика */
+    .model-stats {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        color: var(--text-dark);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        background: var(--content-bg);
+        border-radius: calc(var(--border-radius) / 2);
+        box-shadow: 0 2px 4px var(--shadow-color);
+    }
+
+    .stat-label {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .stat-value {
+        color: var(--accent-color);
+        font-weight: 700;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 850px) {
+        .hero-content {
+            padding-left: 5%;
+            padding-right: 5%;
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .hero-section p {
+            font-size: 1.1rem;
+        }
+        
+        .nav-pills {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .nav-pills .nav-link {
+            font-size: 1rem;
+            padding: 0.75rem;
+            white-space: normal;
+        }
+    }
+
+    /* Стили для переключателя темы */
+    .theme-switcher {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+
+    .theme-toggle {
+        background: transparent;
+        border: 2px solid var(--text-light);
+        color: var(--text-light);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+    }
+
+    .theme-toggle .dark-icon {
+        display: none;
+    }
+
+    [data-theme="dark"] .theme-toggle .light-icon {
+        display: none;
+    }
+
+    [data-theme="dark"] .theme-toggle .dark-icon {
+        display: inline-block;
+    }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Математичний аналіз</h1>
+                <p>Аналіз даних, моделювання та оптимізація</p>
+            </div>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="bi bi-moon-fill"></i>
+            </button>
+        </section>
+
+        <!-- Main Content -->
+        <div class="container mt-4">
+            <ul class="nav nav-pills mb-4 justify-content-center" id="mainTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#analysis">
+                        <i class="bi bi-graph-up"></i> Аналіз даних
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#modeling">
+                        <i class="bi bi-bezier2"></i> Моделювання
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#optimization">
+                        <i class="bi bi-arrow-up-right"></i> Оптимізація
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#ai">
+                        <i class="bi bi-cpu"></i> ШІ Асистент
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="mainTabContent">
+                <!-- Analysis Tab -->
+                <div class="tab-pane fade show active" id="analysis">
+                    <div class="content-block p-4">
+                        <div class="mb-4">
+                            <label for="data-input" class="form-label">Введіть дані для аналізу (через кому):</label>
+                            <input type="text" id="data-input" class="modern-input" placeholder="Наприклад: 1.5, 2.8, 4.2, 3.9, 5.1">
+                            <button class="btn-calculate mt-3" id="analyze-btn">
+                                <i class="bi bi-calculator"></i> Аналізувати
+                            </button>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="analysisChart"></canvas>
+                        </div>
+                        <div id="analysis-stats" class="mt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Other tabs content... -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Wait for main.js to load and initialize
+        window.addEventListener('load', function() {
+            // Theme toggle function
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                html.setAttribute('data-theme', newTheme);
+                themeToggle.innerHTML = newTheme === 'dark' ? 
+                    '<i class="bi bi-sun-fill"></i>' : 
+                    '<i class="bi bi-moon-fill"></i>';
+                
+                // Update chart colors
+                if (typeof window.updateChartColors === 'function') {
+                    window.updateChartColors();
+                }
+            });
+
+            // Initialize theme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+            }
+
+            // Add click handler for analyze button
+            const analyzeBtn = document.getElementById('analyze-btn');
+            if (analyzeBtn) {
+                analyzeBtn.addEventListener('click', function() {
+                    if (typeof window.calculateAnalysis === 'function') {
+                        window.calculateAnalysis();
+                    } else {
+                        console.error('calculateAnalysis function is not available');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %} 

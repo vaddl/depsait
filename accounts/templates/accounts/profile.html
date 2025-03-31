@@ -1,0 +1,192 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Профиль пользователя -->
+        <div class="col-md-4">
+            <div class="content-block">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                    <h3 class="mt-2">{{ user.username }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <p class="text-muted">Дата реєстрації: {{ user.date_joined|date:"d.m.Y" }}</p>
+                </div>
+                
+                <!-- Переключатель темы -->
+                <div class="theme-toggle mb-4">
+                    <h5>Налаштування інтерфейсу</h5>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="themeToggle" 
+                               {% if user.theme_preference == 'dark' %}checked{% endif %}>
+                        <label class="form-check-label" for="themeToggle">
+                            Темна тема
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="col-md-8">
+            <div class="content-block">
+                <h4>Статистика використання</h4>
+                
+                <!-- Основные показатели -->
+                <div class="row stats-grid mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ user.statistics.total_calculations|default:"0" }}</div>
+                            <div class="stat-label">Всього обчислень</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ user.statistics.data_analysis_count|default:"0" }}</div>
+                            <div class="stat-label">Аналіз даних</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ user.statistics.modeling_count|default:"0" }}</div>
+                            <div class="stat-label">Моделювання</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ user.statistics.optimization_count|default:"0" }}</div>
+                            <div class="stat-label">Оптимізація</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Дополнительная информация -->
+                <div class="additional-stats">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Улюблена модель</h5>
+                            <p class="model-name">{{ user.statistics.favorite_model|default:"Не визначено"|title }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Остання активність</h5>
+                            <p class="last-activity">{{ user.statistics.last_activity|date:"d.m.Y H:i"|default:"Немає активності" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Стили -->
+<style>
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.model-name {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.last-activity {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.theme-toggle {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding-top: 1rem;
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-dark: #e0e0e0;
+    --accent-color: #ff6b6b;
+}
+
+[data-theme="dark"] .content-block {
+    background: #2d2d2d;
+}
+
+[data-theme="dark"] .stat-card {
+    background: #363636;
+}
+</style>
+
+<!-- Скрипт для переключения темы -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Функция для обновления темы
+    function updateTheme(isDark) {
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        
+        // Сохраняем выбор пользователя
+        fetch('/accounts/update_theme/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                theme: isDark ? 'dark' : 'light'
+            })
+        });
+    }
+    
+    // Обработчик переключения
+    themeToggle.addEventListener('change', function() {
+        updateTheme(this.checked);
+    });
+    
+    // Устанавливаем начальное состояние
+    const savedTheme = localStorage.getItem('theme') || '{{ user.theme_preference }}';
+    themeToggle.checked = savedTheme === 'dark';
+    updateTheme(themeToggle.checked);
+});
+
+// Получение CSRF токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %} 
